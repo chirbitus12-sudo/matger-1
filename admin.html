@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المدير - تأكيد الطلبات</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+        /* Receipt Preview Modal Custom Layout */
+        #receipt-preview-img {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="glass">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span>❄️</span> متجر <span>البرودة الرقمي</span>
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">الرئيسية</a>
+                <a href="admin.html">لوحة الإدارة</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Login Form Container -->
+    <div id="login-container" class="glass" style="max-width: 400px; margin: 6rem auto; padding: 2rem; display: block;">
+        <h2 style="text-align: center; margin-bottom: 1.5rem;">تسجيل الدخول للمدير</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="admin-username">اسم المستخدم:</label>
+                <input type="text" id="admin-username" class="form-control" placeholder="أدخل اسم المستخدم" required>
+            </div>
+            <div class="form-group">
+                <label for="admin-password">كلمة المرور:</label>
+                <input type="password" id="admin-password" class="form-control" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">دخول</button>
+        </form>
+    </div>
+
+    <!-- Main Admin Dashboard Content (Hidden by default) -->
+    <main class="container admin-container glass" id="admin-content" style="display: none;">
+        <div class="header-actions">
+            <div>
+                <h2>لوحة تحكم المدير (إدارة طلبات بريدي موب / CCP)</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">مراجعة وصول الدفعات، تفعيل روابط التحميل للزبائن، أو حذف الطلبات.</p>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <button id="refresh-btn" class="btn btn-primary">تحديث القائمة 🔄</button>
+                <button id="logout-btn" class="btn btn-danger" style="padding: 0.5rem 1rem;">خروج 🚪</button>
+            </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="order-table">
+                <thead>
+                    <tr>
+                        <th>رقم الطلب</th>
+                        <th>المنتج</th>
+                        <th>السعر</th>
+                        <th>إيميل العميل</th>
+                        <th>كود المعاملة</th>
+                        <th>وصل الدفع</th>
+                        <th>التاريخ</th>
+                        <th>الحالة</th>
+                        <th>الخيارات</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-list">
+                    <!-- Orders will be injected here -->
+                </tbody>
+            </table>
+            
+            <div id="no-orders-msg" style="text-align: center; padding: 3rem; color: var(--text-muted); display: none;">
+                <span style="font-size: 3rem;">📭</span>
+                <p style="margin-top: 1rem; font-size: 1.1rem;">لا توجد أي طلبات حالياً.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Receipt Preview Modal -->
+    <div class="modal" id="receipt-modal">
+        <div class="modal-content glass" style="max-width: 600px; text-align: center;">
+            <button class="close-btn" id="close-receipt-modal">&times;</button>
+            <h3 style="margin-bottom: 1rem;">صورة وصل الدفع المرفقة</h3>
+            <img id="receipt-preview-img" src="" alt="Receipt Image Preview">
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 متجر البرودة الرقمي. لوحة التحكم للمدير.</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const loginContainer = document.getElementById("login-container");
+            const adminContent = document.getElementById("admin-content");
+            const loginForm = document.getElementById("login-form");
+            const logoutBtn = document.getElementById("logout-btn");
+
+            const ordersList = document.getElementById("orders-list");
+            const noOrdersMsg = document.getElementById("no-orders-msg");
+            const refreshBtn = document.getElementById("refresh-btn");
+            const receiptModal = document.getElementById("receipt-modal");
+            const receiptPreviewImg = document.getElementById("receipt-preview-img");
+            const closeReceiptModal = document.getElementById("close-receipt-modal");
+
+            // Authentication check
+            function checkAuth() {
+                if (sessionStorage.getItem("adminLoggedIn") === "true") {
+                    loginContainer.style.display = "none";
+                    adminContent.style.display = "block";
+                    loadOrders();
+                } else {
+                    loginContainer.style.display = "block";
+                    adminContent.style.display = "none";
+                }
+            }
+
+            // Handle Login Submission
+            loginForm.addEventListener("submit", (e) => {
+                e.preventDefault();
+                const usernameInput = document.getElementById("admin-username").value.trim();
+                const passwordInput = document.getElementById("admin-password").value.trim();
+
+                if (usernameInput === "KARMIOSA" && passwordInput === "1799N") {
+                    sessionStorage.setItem("adminLoggedIn", "true");
+                    showToast("تم تسجيل الدخول بنجاح!");
+                    checkAuth();
+                } else {
+                    showToast("اسم المستخدم أو كلمة المرور غير صحيحة!", "error");
+                }
+            });
+
+            // Handle Logout
+            logoutBtn.addEventListener("click", () => {
+                sessionStorage.removeItem("adminLoggedIn");
+                showToast("تم تسجيل الخروج بنجاح.");
+                checkAuth();
+            });
+
+            function loadOrders() {
+                const orders = db.getOrders();
+                ordersList.innerHTML = "";
+
+                if (orders.length === 0) {
+                    noOrdersMsg.style.display = "block";
+                    return;
+                } else {
+                    noOrdersMsg.style.display = "none";
+                }
+
+                orders.forEach(order => {
+                    const tr = document.createElement("tr");
+
+                    // Status Badge
+                    const badgeClass = order.status === "approved" ? "badge-approved" : "badge-pending";
+                    const statusText = order.status === "approved" ? "مؤكد" : "معلق";
+
+                    // Action buttons
+                    let actionBtn = "";
+                    if (order.status === "pending") {
+                        actionBtn = `<button class="btn btn-accent btn-sm approve-btn" data-id="${order.id}" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; margin-left: 0.5rem;">تأكيد الدفع</button>`;
+                    }
+
+                    tr.innerHTML = `
+                        <td style="font-weight: 600; color: var(--primary); font-size: 0.85rem;">${order.id}</td>
+                        <td>${order.productTitle}</td>
+                        <td style="color: var(--accent); font-weight: bold;">${order.price}</td>
+                        <td style="font-size: 0.9rem;">${order.email}</td>
+                        <td style="font-family: monospace;">${order.reference}</td>
+                        <td>
+                            <img src="${order.receipt}" class="receipt-thumb view-receipt" data-src="${order.receipt}" alt="Receipt">
+                        </td>
+                        <td style="font-size: 0.85rem; color: var(--text-muted);">${order.date}</td>
+                        <td><span class="badge ${badgeClass}">${statusText}</span></td>
+                        <td style="white-space: nowrap;">
+                            ${actionBtn}
+                            <button class="btn btn-danger btn-sm delete-btn" data-id="${order.id}" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">حذف</button>
+                        </td>
+                    `;
+                    ordersList.appendChild(tr);
+                });
+            }
+
+            // Click Events delegation
+            document.addEventListener("click", (e) => {
+                const orderId = e.target.dataset.id;
+
+                if (e.target.classList.contains("approve-btn")) {
+                    if (confirm("هل أنت متأكد من تأكيد دفعة هذا الطلب وتفعيل رابط التحميل للعميل؟")) {
+                        db.updateOrderStatus(orderId, "approved");
+                        showToast("تم تأكيد الطلب بنجاح وتفعيل رابط التنزيل للعميل!");
+                        loadOrders();
+                    }
+                }
+
+                if (e.target.classList.contains("delete-btn")) {
+                    if (confirm("هل أنت متأكد من رغبتك في حذف هذا الطلب نهائياً؟ لا يمكن التراجع عن هذا الإجراء.")) {
+                        db.deleteOrder(orderId);
+                        showToast("تم حذف الطلب بنجاح من النظام.", "error");
+                        loadOrders();
+                    }
+                }
+
+                if (e.target.classList.contains("view-receipt")) {
+                    const imgSrc = e.target.dataset.src;
+                    receiptPreviewImg.src = imgSrc;
+                    receiptModal.classList.add("active");
+                }
+            });
+
+            closeReceiptModal.addEventListener("click", () => {
+                receiptModal.classList.remove("active");
+            });
+
+            refreshBtn.addEventListener("click", () => {
+                loadOrders();
+                showToast("تم تحديث قائمة الطلبات.");
+            });
+
+            // Initial auth run
+            checkAuth();
+        });
+    </script>
+</body>
+</html>

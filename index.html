@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجري لبيع المنتجات الرقمية</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="glass">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span>❄️</span> متجر <span>البرودة الرقمي</span>
+            </a>
+            <nav class="nav-links">
+                <a href="index.html">الرئيسية</a>
+                <a href="client.html">متابعة طلبي</a>
+                <a href="admin.html" style="opacity: 0.5;">بوابة الإدارة</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>متجرك الرقمي الهادئ والموثوق</h1>
+            <p>اكتشف أفضل الكورسات والكتب والملفات الجاهزة وحملها فوراً بعد الدفع الآمن عبر بريدي موب.</p>
+        </section>
+
+        <section class="products-grid" id="products-container">
+            <!-- Products will be injected by JavaScript -->
+        </section>
+    </main>
+
+    <!-- Checkout Modal -->
+    <div class="modal" id="checkout-modal">
+        <div class="modal-content glass">
+            <button class="close-btn" id="close-modal-btn">&times;</button>
+            <h2 style="margin-bottom: 1.5rem;" id="modal-product-title">شراء المنتج</h2>
+            
+            <div class="payment-info">
+                <p>الرجاء الدفع عبر بريدي موب / CCP وإرفاق إثبات الدفع:</p>
+                <div class="payment-details">
+                    <span>الاسم:</span> <span>محمد بن أحمد</span>
+                    <span>RIP:</span> <span>007999990022345678 88</span>
+                    <span>CCP:</span> <span>1234567 مفتاح 89</span>
+                    <span>المبلغ:</span> <span id="modal-product-price" style="font-weight: 700; color: var(--accent);">0 دج</span>
+                </div>
+            </div>
+
+            <form id="checkout-form">
+                <input type="hidden" id="checkout-product-id">
+                
+                <div class="form-group">
+                    <label for="customer-email">البريد الإلكتروني للعميل (سيصلك رابط التحميل هنا):</label>
+                    <input type="email" id="customer-email" class="form-control" placeholder="example@mail.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="payment-ref">رقم المعاملة أو كود الدفع (اختياري):</label>
+                    <input type="text" id="payment-ref" class="form-control" placeholder="123456...">
+                </div>
+
+                <div class="form-group">
+                    <label for="payment-receipt">رفع صورة وصل الدفع (بريدي موب أو CCP):</label>
+                    <input type="file" id="payment-receipt" class="form-control" accept="image/*" required>
+                </div>
+
+                <button type="submit" class="btn btn-accent w-100" style="width: 100%; margin-top: 1rem;">تأكيد إرسال الطلب</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal showing simulated email links -->
+    <div class="modal" id="success-modal">
+        <div class="modal-content glass" style="text-align: center;">
+            <button class="close-btn" id="close-success-btn">&times;</button>
+            <span style="font-size: 3.5rem;">🎉</span>
+            <h2 style="color: var(--success); margin: 1rem 0;">تم إرسال طلبك بنجاح!</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">تم إرسال إشعار فوري إلى البريد الإلكتروني للمدير لتأكيد الدفع، كما أرسلنا لك رابط تتبع طلبك.</p>
+            
+            <div style="background: rgba(15, 23, 42, 0.4); padding: 1rem; border-radius: 12px; text-align: right; margin-bottom: 1.5rem;">
+                <p style="font-size: 0.9rem; color: var(--accent); margin-bottom: 0.5rem; font-weight: bold;">📩 محاكاة صندوق البريد الإلكتروني (الروابط المرسلة):</p>
+                <div style="margin-bottom: 0.75rem;">
+                    <strong style="font-size: 0.85rem;">رابط تتبع العميل:</strong><br>
+                    <a id="client-link" href="#" target="_blank" style="color: var(--primary); word-break: break-all; font-size: 0.85rem;">-</a>
+                </div>
+                <div>
+                    <strong style="font-size: 0.85rem;">رابط إشعار لوحة المدير (سري):</strong><br>
+                    <a id="admin-link" href="#" target="_blank" style="color: var(--primary); word-break: break-all; font-size: 0.85rem;">-</a>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" id="btn-done" style="width: 100%;">حسناً، فهمت</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 متجر البرودة الرقمي. جميع الحقوق محفوظة.</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const products = db.getProducts();
+            const container = document.getElementById("products-container");
+
+            // Render Products
+            products.forEach(p => {
+                const card = document.createElement("div");
+                card.className = "product-card glass";
+                card.innerHTML = `
+                    <img src="${p.image}" alt="${p.title}" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-title">${p.title}</h3>
+                        <p class="product-description">${p.description}</p>
+                        <div class="product-footer">
+                            <span class="product-price">${p.price}</span>
+                            <button class="btn btn-primary buy-btn" data-id="${p.id}">شراء الآن</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            // Modal Interactions
+            const checkoutModal = document.getElementById("checkout-modal");
+            const successModal = document.getElementById("success-modal");
+            const closeModalBtn = document.getElementById("close-modal-btn");
+            const closeSuccessBtn = document.getElementById("close-success-btn");
+            const btnDone = document.getElementById("btn-done");
+            const checkoutForm = document.getElementById("checkout-form");
+
+            let selectedProduct = null;
+
+            document.addEventListener("click", (e) => {
+                if (e.target.classList.contains("buy-btn")) {
+                    const prodId = e.target.dataset.id;
+                    selectedProduct = products.find(p => p.id === prodId);
+                    if (selectedProduct) {
+                        document.getElementById("modal-product-title").textContent = selectedProduct.title;
+                        document.getElementById("modal-product-price").textContent = selectedProduct.price;
+                        document.getElementById("checkout-product-id").value = selectedProduct.id;
+                        checkoutModal.classList.add("active");
+                    }
+                }
+            });
+
+            const hideModals = () => {
+                checkoutModal.classList.remove("active");
+                successModal.classList.remove("active");
+                checkoutForm.reset();
+            };
+
+            closeModalBtn.addEventListener("click", hideModals);
+            closeSuccessBtn.addEventListener("click", hideModals);
+            btnDone.addEventListener("click", hideModals);
+
+            // Handle checkout form submission
+            checkoutForm.addEventListener("submit", (e) => {
+                e.preventDefault();
+
+                const email = document.getElementById("customer-email").value;
+                const ref = document.getElementById("payment-ref").value;
+                const fileInput = document.getElementById("payment-receipt");
+
+                const processSubmission = (receiptBase64) => {
+                    const orderId = "order-" + Math.random().toString(36).substr(2, 9);
+                    const newOrder = {
+                        id: orderId,
+                        email: email,
+                        reference: ref || "غير متوفر",
+                        receipt: receiptBase64 || "https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?auto=format&fit=crop&w=150&q=80",
+                        productId: selectedProduct.id,
+                        productTitle: selectedProduct.title,
+                        price: selectedProduct.price,
+                        status: "pending",
+                        date: new Date().toLocaleString("ar-DZ")
+                    };
+
+                    db.addOrder(newOrder);
+
+                    // Show success notification & set the simulated URLs
+                    const clientUrl = window.location.origin + window.location.pathname.replace("index.html", "") + `client.html?orderId=${orderId}`;
+                    const adminUrl = window.location.origin + window.location.pathname.replace("index.html", "") + `admin.html`;
+
+                    document.getElementById("client-link").href = clientUrl;
+                    document.getElementById("client-link").textContent = clientUrl;
+                    document.getElementById("admin-link").href = adminUrl;
+                    document.getElementById("admin-link").textContent = adminUrl;
+
+                    checkoutModal.classList.remove("active");
+                    successModal.classList.add("active");
+                    showToast("تم إرسال الطلب وتخزينه بنجاح!");
+                };
+
+                // Convert file to Base64 to save in simulated database (localStorage)
+                if (fileInput.files && fileInput.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        processSubmission(event.target.result);
+                    };
+                    reader.readAsDataURL(fileInput.files[0]);
+                } else {
+                    processSubmission(null);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
