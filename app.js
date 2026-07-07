@@ -1,4 +1,6 @@
-// Initial Digital Products Mock Data
+// ========================
+// PRODUCTS DATA
+// ========================
 const DEFAULT_PRODUCTS = [
     {
         id: "prod-1",
@@ -26,7 +28,9 @@ const DEFAULT_PRODUCTS = [
     }
 ];
 
-// Database simulation using localStorage
+// ========================
+// DATABASE (localStorage)
+// ========================
 const db = {
     getProducts: () => {
         let prods = localStorage.getItem("products");
@@ -59,25 +63,64 @@ const db = {
     }
 };
 
-// Global UI Helper Functions
+// ========================
+// TOAST NOTIFICATION
+// ========================
 function showToast(message, type = "success") {
-    const toast = document.createElement("div");
-    toast.className = `glass`;
-    toast.style.position = "fixed";
-    toast.style.bottom = "20px";
-    toast.style.right = "20px";
-    toast.style.padding = "1rem 2rem";
-    toast.style.zIndex = "9999";
-    toast.style.borderRight = `4px solid ${type === "success" ? "var(--success)" : "var(--danger)"}`;
-    toast.style.fontSize = "0.95rem";
-    toast.style.fontWeight = "600";
-    toast.style.color = "var(--text-main)";
-    toast.style.direction = "rtl";
-    toast.textContent = message;
+    // Remove existing toast
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
 
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
     document.body.appendChild(toast);
+
+    // Trigger animation
+    requestAnimationFrame(() => {
+        toast.classList.add('show');
+    });
+
     setTimeout(() => {
-        toast.style.opacity = "0";
-        setTimeout(() => toast.remove(), 300);
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
     }, 4000);
 }
+
+// ========================
+// HEADER SCROLL EFFECT
+// ========================
+window.addEventListener('scroll', () => {
+    const header = document.querySelector('header');
+    if (header) {
+        if (window.scrollY > 20) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    }
+});
+
+// ========================
+// SCROLL ANIMATIONS
+// ========================
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('animate-in');
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.feature-card, .product-card, .stat-card').forEach(el => {
+        el.style.opacity = '0';
+        observer.observe(el);
+    });
+});

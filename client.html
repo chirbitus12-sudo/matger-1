@@ -3,42 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تتبع طلبي - بوابة العميل</title>
+    <title>تتبع طلبي - متجر الملف</title>
+    <meta name="description" content="تتبع حالة طلبك وتحميل منتجاتك الرقمية من متجر الملف.">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header class="glass">
+    <!-- ======================== HEADER ======================== -->
+    <header>
         <div class="nav-container">
             <a href="index.html" class="logo">
-                <span>❄️</span> متجر <span>البرودة الرقمي</span>
+                <div class="logo-icon">📄</div>
+                <div class="logo-text">
+                    <span class="logo-title">متجر الملف</span>
+                    <span class="logo-subtitle"><span class="dot">✦</span> منتجات رقمية احترافية بضغطة زر</span>
+                </div>
             </a>
-            <nav class="nav-links">
-                <a href="index.html">الرئيسية</a>
-                <a href="client.html">متابعة طلبي</a>
+            <nav class="nav-center">
+                <a href="index.html" class="nav-link">الرئيسية</a>
+                <a href="client.html" class="nav-link active">متابعة طلبي</a>
             </nav>
+            <div class="nav-actions">
+                <a href="index.html" class="btn btn-primary">
+                    <span class="btn-icon">🛒</span>
+                    تسوق الآن
+                </a>
+            </div>
         </div>
     </header>
 
-    <main class="container" style="max-width: 600px; padding-top: 4rem;">
-        <div class="glass" style="padding: 2rem; margin-top: 2rem;">
-            <h2 style="margin-bottom: 1.5rem; text-align: center;">صفحة تحميل المنتج للعميل</h2>
+    <!-- ======================== MAIN CONTENT ======================== -->
+    <main style="flex-grow: 1; display: flex; align-items: flex-start; justify-content: center; padding: 2rem;">
+        <div class="client-card" style="margin-top: 2rem;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="width: 64px; height: 64px; background: var(--accent-lighter); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.75rem; margin-bottom: 1rem; border: 1px solid rgba(44, 182, 125, 0.15);">📦</div>
+                <h2 style="font-weight: 800; margin-bottom: 0.25rem;">صفحة تحميل المنتج</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">تتبع طلبك وتحميل منتجاتك الرقمية</p>
+            </div>
 
             <!-- Order Lookup Form -->
             <div id="lookup-section">
-                <p style="color: var(--text-muted); margin-bottom: 1.5rem; text-align: center;">يرجى إدخال رقم الطلب الخاص بك لتنزيل ملفاتك أو معرفة حالة الدفع.</p>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem; text-align: center; font-size: 0.9rem;">يرجى إدخال رقم الطلب الخاص بك لتنزيل ملفاتك أو معرفة حالة الدفع.</p>
                 <div class="form-group">
                     <label for="search-order-id">رقم الطلب (Order ID):</label>
                     <input type="text" id="search-order-id" class="form-control" placeholder="order-xxxxxxxxx">
                 </div>
-                <button id="lookup-btn" class="btn btn-primary" style="width: 100%;">استعلام عن الطلب</button>
+                <button id="lookup-btn" class="btn btn-primary" style="width: 100%; padding: 0.85rem;">استعلام عن الطلب</button>
             </div>
 
             <!-- Order Status Screen -->
             <div id="status-section" style="display: none;">
                 <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem;">
-                    <h3 id="status-product-title">-</h3>
-                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.25rem;">رقم الطلب: <span id="status-order-id" style="color: var(--primary);"></span></p>
+                    <h3 id="status-product-title" style="font-weight: 700;">-</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">رقم الطلب: <span id="status-order-id" style="color: var(--primary); font-weight: 600;"></span></p>
                 </div>
 
                 <div class="form-group">
@@ -55,28 +72,29 @@
 
                 <div class="form-group">
                     <label>السعر:</label>
-                    <p id="status-order-price" style="color: var(--accent); font-weight: 700;">-</p>
+                    <p id="status-order-price" style="color: var(--primary); font-weight: 800; font-size: 1.25rem;">-</p>
                 </div>
 
                 <!-- Download Area (Active ONLY when approved) -->
-                <div id="download-area" style="margin-top: 2rem; padding: 1.5rem; border-radius: 12px; background: rgba(52, 211, 153, 0.05); border: 1px solid rgba(52, 211, 153, 0.2); display: none; text-align: center;">
-                    <p style="color: var(--success); font-weight: 600; margin-bottom: 1rem; font-size: 1.1rem;">🎉 تم تأكيد الدفع بنجاح! منتجك جاهز للتحميل الآن:</p>
-                    <a id="download-link" href="#" class="btn btn-accent" style="width: 100%; text-decoration: none;" download>تنزيل المنتج الرقمي</a>
+                <div id="download-area" style="margin-top: 2rem; padding: 1.5rem; border-radius: 16px; background: rgba(34, 197, 94, 0.04); border: 1px solid rgba(34, 197, 94, 0.15); display: none; text-align: center;">
+                    <p style="color: var(--success); font-weight: 700; margin-bottom: 1rem; font-size: 1.05rem;">🎉 تم تأكيد الدفع بنجاح! منتجك جاهز للتحميل الآن:</p>
+                    <a id="download-link" href="#" class="btn btn-accent" style="width: 100%; text-decoration: none; padding: 0.85rem;" download>تنزيل المنتج الرقمي</a>
                 </div>
 
                 <!-- Pending Verification Box -->
-                <div id="pending-area" style="margin-top: 2rem; padding: 1.5rem; border-radius: 12px; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2); text-align: center;">
-                    <p style="color: #fbbf24; font-weight: 600;">⏳ الدفع قيد المراجعة</p>
+                <div id="pending-area" style="margin-top: 2rem; padding: 1.5rem; border-radius: 16px; background: rgba(245, 158, 11, 0.04); border: 1px solid rgba(245, 158, 11, 0.15); text-align: center;">
+                    <p style="color: #d97706; font-weight: 700;">⏳ الدفع قيد المراجعة</p>
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">سيقوم المدير بمراجعة الدفع عبر بريدي موب / CCP قريباً جداً، وتفعيل رابط التنزيل لك تلقائياً.</p>
                 </div>
 
-                <button id="back-btn" class="btn" style="width: 100%; margin-top: 1.5rem; background: rgba(255,255,255,0.05); color: var(--text-main);">الرجوع للاستعلام</button>
+                <button id="back-btn" class="btn btn-outline" style="width: 100%; margin-top: 1.5rem;">الرجوع للاستعلام</button>
             </div>
         </div>
     </main>
 
+    <!-- ======================== FOOTER ======================== -->
     <footer>
-        <p>&copy; 2026 متجر البرودة الرقمي. جميع الحقوق محفوظة.</p>
+        <p>&copy; 2026 متجر الملف. جميع الحقوق محفوظة.</p>
     </footer>
 
     <script src="app.js"></script>
